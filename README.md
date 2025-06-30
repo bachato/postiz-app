@@ -14,15 +14,15 @@
 </p>
 
 <p align="center">
-<a href="https://opensource.org/licenses/Apache-2.0">
-  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+<a href="https://opensource.org/license/agpl-v3">
+  <img src="https://img.shields.io/badge/License-AGPL%203.0-blue.svg" alt="License">
 </a>
 </p>
 
 <div align="center">
   <strong>
   <h2>Your ultimate AI social media scheduling tool</h2><br />
-  <a href="https://postiz.com">Postiz</a>: An alternative to: Buffer.com, Hypefury, Twitter Hunter, Etc...<br /><br />
+  <a href="https://postiz.com">Postiz</a>: An alternative to: Buffer.com, Hypefury, Twitter Hunter, etc...<br /><br />
   </strong>
   Postiz offers everything you need to manage your social media posts,<br />build an audience, capture leads, and grow your business.
 </div>
@@ -99,9 +99,23 @@
 
 To have the project up and running, please follow the [Quick Start Guide](https://docs.postiz.com/quickstart)
 
-## Invest in the Postiz Coin :)
+## Sponsor Postiz
 
-DMsTbeCfX1crgAse5tver98KAMarPWeP3d6U3Gmmpump
+We now give a few options to Sponsor Postiz:
+- Just a donation: You like what we are building, and want to buy us some coffees so we can build faster.
+- Main Repository: Get your logo with a backlink from the main Postiz repository. Postiz has almost 3m downloads and 20k views per month.
+- Main Repository + Website: Get your logo on the central repository and the main website. Here are some metrics: - Website has 20k hits per month + 65 DR (strong backlink) - Repository has 20k hits per month + Almost 3m docker downloads.
+
+Link: https://opencollective.com/postiz
+
+## Postiz Compliance
+
+- Postiz is an open-source, self-hosted social media scheduling tool that supports platforms like X (formerly Twitter), Bluesky, Mastodon, Discord, and others.
+- Postiz hosted service uses official, platform-approved OAuth flows.
+- Postiz does not automate or scrape content from social media platforms.
+- Postiz does not collect, store, or proxy API keys or access tokens from users.
+- Postiz never ask users to paste API keys into our hosted product.
+- Postiz Users always authenticate directly with the social platform (e.g., X, Discord, etc.), ensuring platform compliance and data privacy.
 
 # License
 

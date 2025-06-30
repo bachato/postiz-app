@@ -175,7 +175,7 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     });
     const { url, oauth_token, oauth_token_secret } =
       await client.generateAuthLink(
-        process.env.FRONTEND_URL + `/integrations/social/x`,
+        (process.env.X_URL || process.env.FRONTEND_URL) + `/integrations/social/x`,
         {
           authAccessType: 'write',
           linkMode: 'authenticate',
@@ -241,6 +241,13 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     postDetails: PostDetails<{
       active_thread_finisher: boolean;
       thread_finisher: string;
+      community?: string;
+      who_can_reply_post:
+        | 'everyone'
+        | 'following'
+        | 'mentionedUsers'
+        | 'subscribers'
+        | 'verified';
     }>[]
   ): Promise<PostResponse[]> {
     const [accessTokenSplit, accessSecretSplit] = accessToken.split(':');
@@ -299,6 +306,18 @@ export class XProvider extends SocialAbstract implements SocialProvider {
 
       // @ts-ignore
       const { data }: { data: { id: string } } = await client.v2.tweet({
+        ...(!postDetails?.[0]?.settings?.who_can_reply_post ||
+        postDetails?.[0]?.settings?.who_can_reply_post === 'everyone'
+          ? {}
+          : {
+              reply_settings: postDetails?.[0]?.settings?.who_can_reply_post,
+            }),
+        ...(postDetails?.[0]?.settings?.community
+          ? {
+              community_id:
+                postDetails?.[0]?.settings?.community?.split('/').pop() || '',
+            }
+          : {}),
         text: post.message,
         ...(media_ids.length ? { media: { media_ids } } : {}),
         ...(ids.length
