@@ -10,6 +10,7 @@ import React, {
   ClipboardEvent,
   forwardRef,
   useImperativeHandle,
+  Fragment,
 } from 'react';
 import clsx from 'clsx';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
@@ -20,7 +21,10 @@ import { BoldText } from '@gitroom/frontend/components/new-launch/bold.text';
 import { UText } from '@gitroom/frontend/components/new-launch/u.text';
 import { SignatureBox } from '@gitroom/frontend/components/signature';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
-import { useLaunchStore } from '@gitroom/frontend/components/new-launch/store';
+import {
+  SelectedIntegrations,
+  useLaunchStore,
+} from '@gitroom/frontend/components/new-launch/store';
 import { useShallow } from 'zustand/react/shallow';
 import { AddPostButton } from '@gitroom/frontend/components/new-launch/add.post.button';
 import { MultiMediaComponent } from '@gitroom/frontend/components/media/media.component';
@@ -54,6 +58,7 @@ import Mention from '@tiptap/extension-mention';
 import { suggestion } from '@gitroom/frontend/components/new-launch/mention.component';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { AComponent } from '@gitroom/frontend/components/new-launch/a.component';
+import { capitalize } from 'lodash';
 
 const InterceptBoldShortcut = Extension.create({
   name: 'preventBoldWithUnderline',
@@ -114,6 +119,8 @@ export const EditorWrapper: FC<{
     editor,
     loadedState,
     setLoadedState,
+    selectedIntegration,
+    chars,
   } = useLaunchStore(
     useShallow((state) => ({
       internal: state.internal.find((p) => p.integration.id === state.current),
@@ -142,6 +149,8 @@ export const EditorWrapper: FC<{
       editor: state.editor,
       loadedState: state.loaded,
       setLoadedState: state.setLoaded,
+      selectedIntegration: state.selectedIntegrations,
+      chars: state.chars,
     }))
   );
 
@@ -357,6 +366,21 @@ export const EditorWrapper: FC<{
                 totalChars={totalChars}
                 appendImages={appendImages(index)}
                 dummy={dummy}
+                selectedIntegration={selectedIntegration}
+                chars={chars}
+                childButton={
+                  <>
+                    {canEdit ? (
+                      <AddPostButton
+                        num={index}
+                        onClick={addValue(index)}
+                        postComment={postComment}
+                      />
+                    ) : (
+                      <div className="h-[25px]" />
+                    )}
+                  </>
+                }
               />
             </div>
             <div className="flex flex-col items-center gap-[10px]">
@@ -406,16 +430,6 @@ export const EditorWrapper: FC<{
               )}
             </div>
           </div>
-
-          {canEdit ? (
-            <AddPostButton
-              num={index}
-              onClick={addValue(index)}
-              postComment={postComment}
-            />
-          ) : (
-            <div className="h-[25px]" />
-          )}
         </div>
       ))}
     </div>
@@ -436,7 +450,10 @@ export const Editor: FC<{
   validateChars?: boolean;
   identifier?: string;
   totalChars?: number;
+  selectedIntegration: SelectedIntegrations[];
   dummy: boolean;
+  chars: Record<string, number>;
+  childButton?: React.ReactNode;
 }> = (props) => {
   const {
     editorType = 'normal',
@@ -444,11 +461,13 @@ export const Editor: FC<{
     pictures,
     setImages,
     num,
-    autoComplete,
     validateChars,
     identifier,
     appendImages,
+    selectedIntegration,
     dummy,
+    chars,
+    childButton,
   } = props;
   const user = useUser();
   const [id] = useState(makeId(10));
@@ -510,7 +529,7 @@ export const Editor: FC<{
   );
 
   return (
-    <div>
+    <div className="flex flex-col gap-[20px]">
       <div className="relative bg-bigStrip" id={id}>
         <div className="flex gap-[5px] bg-newBgLineColor border-b border-t border-customColor3 justify-center items-center p-[5px]">
           <SignatureBox editor={editorRef?.current?.editor} />
@@ -636,17 +655,48 @@ export const Editor: FC<{
           </div>
         </div>
       </div>
-      <div className="absolute bottom-10px end-[25px]">
-        {(props?.totalChars || 0) > 0 && (
-          <div
-            className={clsx(
-              'text-end text-sm mt-1',
-              valueWithoutHtml.length > props.totalChars && '!text-red-500'
-            )}
-          >
-            {valueWithoutHtml.length}/{props.totalChars}
-          </div>
-        )}
+      <div className="flex">
+        <div className="flex-1">{childButton}</div>
+        <div className="bottom-10px end-[25px]">
+          {(props?.totalChars || 0) > 0 ? (
+            <div
+              className={clsx(
+                'text-end text-sm mt-1',
+                valueWithoutHtml.length > props.totalChars && '!text-red-500'
+              )}
+            >
+              {valueWithoutHtml.length}/{props.totalChars}
+            </div>
+          ) : (
+            <div
+              className={clsx(
+                'text-end text-sm mt-1 grid grid-cols-[max-content_max-content] gap-x-[5px]'
+              )}
+            >
+              {selectedIntegration?.map((p) => (
+                <Fragment key={p.integration.id}>
+                  <div
+                    className={
+                      valueWithoutHtml.length > chars?.[p.integration.id] &&
+                      '!text-red-500'
+                    }
+                  >
+                    {p.integration.name} ({capitalize(p.integration.identifier)}
+                    ):
+                  </div>
+                  <div
+                    className={
+                      valueWithoutHtml.length > chars?.[p.integration.id] &&
+                      '!text-red-500'
+                    }
+                  >
+                    {valueWithoutHtml.length}/{chars?.[p.integration.id]}
+                  </div>
+                </Fragment>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

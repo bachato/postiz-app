@@ -15,19 +15,20 @@ export const concurrency = async <T>(
 ) => {
   const strippedIdentifier = identifier.toLowerCase().split('-')[0];
   mapper[strippedIdentifier] ??= new Bottleneck({
-    id: strippedIdentifier + '-concurrency',
+    id: strippedIdentifier + '-concurrency-new',
     maxConcurrent,
     datastore: 'ioredis',
     connection,
+    minTime: 1000,
   });
   let load: T;
   try {
     load = await mapper[strippedIdentifier].schedule<T>(
-      { expiration: 120_000 },
+      { expiration: 600000 },
       async () => {
-        const res = await func();
-        await timer(1000);
-        return res;
+        try {
+          return await func();
+        } catch (err) {}
       }
     );
   } catch (err) {}
